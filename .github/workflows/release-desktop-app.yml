@@ -40,6 +40,9 @@ env:
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
   NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+  AFFINE_GOOGLE_CLIENT_ID: ${{ secrets.AFFINE_GOOGLE_CLIENT_ID }}
+  AFFINE_GOOGLE_CLIENT_SECRET: ${{ secrets.AFFINE_GOOGLE_CLIENT_SECRET }}
+  API_SERVER_PROFILE: prod
 
 jobs:
   make-macos:
@@ -111,7 +114,7 @@ jobs:
       - name: Save windows artifacts
         run: |
           mkdir -p builds
-          mv apps/electron/out/make/zip/win32/x64/AFFiNE-win32-x64-${{ github.event.inputs.version }}.zip ./builds/affine-windows-x64-${{ github.event.inputs.version }}.zip
+          mv apps/electron/out/make/zip/win32/x64/AFFiNE-win32-x64-0.0.0.zip ./builds/affine-windows-x64-${{ github.event.inputs.version }}.zip
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3

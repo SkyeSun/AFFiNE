@@ -9,7 +9,6 @@ import {
 import { useTranslation } from '@affine/i18n';
 import {
   DeletePermanentlyIcon,
-  DeleteTemporarilyIcon,
   FavoritedIcon,
   FavoriteIcon,
   MoreVerticalIcon,
@@ -22,7 +21,7 @@ import { useState } from 'react';
 
 import type { BlockSuiteWorkspace } from '../../../../shared';
 import { toast } from '../../../../utils';
-import { MoveTo } from '../../../affine/operation-menu-items';
+import { MoveTo, MoveToTrash } from '../../../affine/operation-menu-items';
 
 export type OperationCellProps = {
   pageMeta: PageMeta;
@@ -30,7 +29,7 @@ export type OperationCellProps = {
   blockSuiteWorkspace: BlockSuiteWorkspace;
   onOpenPageInNewTab: (pageId: string) => void;
   onToggleFavoritePage: (pageId: string) => void;
-  onToggleTrashPage: (pageId: string) => void;
+  onToggleTrashPage: (pageId: string, isTrash: boolean) => void;
 };
 
 export const OperationCell: React.FC<OperationCellProps> = ({
@@ -44,6 +43,7 @@ export const OperationCell: React.FC<OperationCellProps> = ({
   const { id, favorite } = pageMeta;
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+
   const OperationMenu = (
     <>
       <MenuItem
@@ -65,20 +65,21 @@ export const OperationCell: React.FC<OperationCellProps> = ({
       >
         {t('Open in new tab')}
       </MenuItem>
-      <MoveTo
-        metas={metas}
-        currentMeta={pageMeta}
-        blockSuiteWorkspace={blockSuiteWorkspace}
-      />
-      <MenuItem
-        data-testid="move-to-trash"
-        onClick={() => {
-          setOpen(true);
-        }}
-        icon={<DeleteTemporarilyIcon />}
-      >
-        {t('Move to Trash')}
-      </MenuItem>
+      {!pageMeta.isRootPinboard && (
+        <MoveTo
+          metas={metas}
+          currentMeta={pageMeta}
+          blockSuiteWorkspace={blockSuiteWorkspace}
+        />
+      )}
+      {!pageMeta.isRootPinboard && (
+        <MoveToTrash
+          testId="move-to-trash"
+          onItemClick={() => {
+            setOpen(true);
+          }}
+        />
+      )}
     </>
   );
   return (
@@ -90,21 +91,16 @@ export const OperationCell: React.FC<OperationCellProps> = ({
           disablePortal={true}
           trigger="click"
         >
-          <IconButton>
+          <IconButton data-testid="page-list-operation-button">
             <MoreVerticalIcon />
           </IconButton>
         </Menu>
       </FlexWrapper>
-      <Confirm
+      <MoveToTrash.ConfirmModal
         open={open}
-        title={t('Delete page?')}
-        content={t('will be moved to Trash', {
-          title: pageMeta.title || 'Untitled',
-        })}
-        confirmText={t('Delete')}
-        confirmType="danger"
+        meta={pageMeta}
         onConfirm={() => {
-          onToggleTrashPage(id);
+          onToggleTrashPage(id, true);
           toast(t('Deleted'));
           setOpen(false);
         }}

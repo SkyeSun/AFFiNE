@@ -26,14 +26,16 @@ export type Node<RenderProps = unknown> = {
     },
     renderProps?: RenderProps
   ) => ReactNode;
+  renderTopLine?: boolean;
+  renderBottomLine?: boolean;
 };
 
 type CommonProps<RenderProps = unknown> = {
   enableDnd?: boolean;
   enableKeyboardSelection?: boolean;
   indent?: CSSProperties['paddingLeft'];
-  onAdd?: (node: Node<RenderProps>) => void;
-  onDelete?: (node: Node<RenderProps>) => void;
+  onAdd?: (parentId: string) => void;
+  onDelete?: (deleteId: string) => void;
   onDrop?: OnDrop;
   // Only trigger when the enableKeyboardSelection is true
   onSelect?: (id: string) => void;
