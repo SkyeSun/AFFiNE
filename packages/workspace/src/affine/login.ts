@@ -67,10 +67,13 @@ export const setLoginStorage = (login: LoginResponse) => {
 };
 
 const signInWithElectron = async (firebaseAuth: FirebaseAuth) => {
-  const code = await window.apis?.googleSignIn();
-  const credential = GoogleAuthProvider.credential(code);
-  const user = await signInWithCredential(firebaseAuth, credential);
-  return await user.user.getIdToken();
+  if (window.apis) {
+    const { url, requestInit } = await window.apis.getGoogleOauthCode();
+    const { id_token } = await fetch(url, requestInit).then(res => res.json());
+    const credential = GoogleAuthProvider.credential(id_token);
+    const user = await signInWithCredential(firebaseAuth, credential);
+    return await user.user.getIdToken();
+  }
 };
 
 export const clearLoginStorage = () => {
@@ -167,9 +170,16 @@ export function createAffineAuth(prefix = '/') {
       }
       let provider: AuthProvider;
       switch (method) {
-        case SignMethod.Google:
-          provider = new GoogleAuthProvider();
+        case SignMethod.Google: {
+          const googleProvider = new GoogleAuthProvider();
+          // make sure the user has a chance to select an account
+          // https://developers.google.com/identity/openid-connect/openid-connect#prompt
+          googleProvider.setCustomParameters({
+            prompt: 'select_account',
+          });
+          provider = googleProvider;
           break;
+        }
         case SignMethod.GitHub:
           provider = new GithubAuthProvider();
           break;

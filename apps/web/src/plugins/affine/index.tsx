@@ -1,3 +1,4 @@
+import { prefixUrl } from '@affine/env';
 import { currentAffineUserAtom } from '@affine/workspace/affine/atom';
 import {
   clearLoginStorage,
@@ -24,7 +25,7 @@ import { PageDetailEditor } from '../../components/page-detail-editor';
 import { useAffineRefreshAuthToken } from '../../hooks/affine/use-affine-refresh-auth-token';
 import { AffineSWRConfigProvider } from '../../providers/AffineSWRConfigProvider';
 import { BlockSuiteWorkspace } from '../../shared';
-import { affineApis, prefixUrl } from '../../shared/apis';
+import { affineApis } from '../../shared/apis';
 import { initPage, toast } from '../../utils';
 import type { WorkspacePlugin } from '..';
 import { QueryKey } from './fetcher';
@@ -51,7 +52,10 @@ const getPersistenceAllWorkspace = () => {
           item.id,
           (k: string) =>
             // fixme: token could be expired
-            ({ api: '/api/workspace', token: getLoginStorage()?.token }[k])
+            ({
+              api: prefixUrl + 'api/workspace',
+              token: getLoginStorage()?.token,
+            }[k])
         );
         const affineWorkspace: AffineWorkspace = {
           ...item,
